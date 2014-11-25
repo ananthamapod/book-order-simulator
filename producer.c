@@ -1,21 +1,5 @@
-/*defines*/
-//none
-
 /*includes*/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "tknz3r.h"
-
-/*structs*/
-typedef struct BookOrder_T {
-	char* title;
-	float price;
-	int custID;
-	char* category;
-} bookOrder;
-
-/*globals*/
+#include "producer.h"
 
 /*main code*/
 void parseOrders(File* ordersFile){

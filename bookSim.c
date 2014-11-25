@@ -1,7 +1,5 @@
 /*TODO:
  *implement threading
- *make category queues
- *sending orders to cat. Qs.
  *spawn threads
  *make consumer threads to deal with cat. Qs.
  */
@@ -14,19 +12,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tknz3r.h"
-#include "query.h"
+#include "queue.h"
+#include "producer.h"
+#include "makeQueueTable.h"
 #include <pthread.h>
 
 /*structs*/
-typedef struct cust_T {
-	char* name;
-	int ID;
-	float credit;
-	string address;
-	string state;
-	string zip;
-	struct cust_T* next;
-} customer;
+
 
 /*global variables*/
 
@@ -37,7 +29,7 @@ void exitPrint(char*);
 /*main code*/
 int buildCustomerDB(customer **first, FILE *custDB) {
 
-	customer* curr = NULL;
+	//customer* curr = NULL;
 	TokenizerT* tk = TKCreate(custDB);
 	
 	//Create customer linked list
@@ -47,13 +39,13 @@ int buildCustomerDB(customer **first, FILE *custDB) {
 		if((make = (customer*)calloc(1,sizeof(customer))) == NULL) {//Allocate and NULL out space for customer
 			return -1;
 		}
-		if(*first == NULL) {	//1st customer case
+		/* if(*first == NULL) {	//1st customer case
 			*first = make;
 			curr = *first;
 		}else {			//otherwise
 			curr->next = make;
 			curr = curr->next;
-		}
+		} */
 		for(int fieldCount = 1; fieldCount <7; fieldCount++) {	//get customer data
 			switch (fieldCount) {
 				case 1:
@@ -77,6 +69,8 @@ int buildCustomerDB(customer **first, FILE *custDB) {
 				default:
 					break;
 			}
+			//custTable[make->ID] = make;
+			//Need to create tables still.
 			tok = TKGetNextToken(tk);
 		}
 	}
@@ -106,13 +100,16 @@ int main(int argc, char** argv) {
 	if(pthread_attr_init(&producer_attr) != 0) {
 		exitPrint("pthread_attr_init failed for producer");
 	}
-	int scope = 0;
+	
+	//Change the below.
+	
+	/* int scope = 0;
 	if(pthread_create(&producer, &producer_attr, testCustomerPrint, first) != 0) {
 		exitPrint("pthread_create failed for producer");
 	}
 	if(pthread_join(producer, NULL) != 0) {
 		exitPrint("thread failed to return properly");
-	}
+	} */
 
 	printf("Success\n");
 	return 0;
@@ -132,7 +129,7 @@ void *testCustomerPrint(void* input) {
 		printf("%s\n",print->address);
 		printf("%s\n",print->state);
 		printf("%s\n",print->zip);
-		printf("%x\n",print->next);
+//		printf("%x\n",print->next);
 	}
 	return NULL;
 }

@@ -21,23 +21,33 @@ typedef struct queue_T {
 //Function to add order to a category queue. If the category queue does not exist, it creates it.
 void insertOrder(bookOrder *incoming) {	//Should only be run by the producer thread.
 	ENTRY temp, *res;
-	//mutex lock here i suppose
+	/*
+		MUTEX LOCK 
+		MUTEX LOCK
+		MUTEX LOCK
+		MUTEX LOCK
+	 */
 	temp.key = incoming->category;
 	res = hsearch(temp,FIND);
 	if(res == NULL) {	//New category = new queue. Spawn a new thread to handle the queue.
-		queue* newQ = (queue*) malloc(sizeof(queue));
+/* 		queue* newQ = (queue*) malloc(sizeof(queue));
 		newQ->first = incoming;
 		newQ->last = incoming;
 		newQ->category = incoming->category;
 		temp.data = newQ;
 		temp.key = incoming->category;	//Just to be safe and try to prevent overwriting. May not work, though.
-		hsearch(temp,ENTER);
+		hsearch(temp,ENTER); */
 	} else {	//Seen category before. Adding to category queue.
 		queue* Q = (queue*) res->data;
 		Q->last->next = incoming;
 		Q->last = Q->last->next;
 	}
-	//mutex unlock here i suppose
+	/*
+	MUTEX UNLOCK
+	MUTEX UNLOCK
+	MUTEX UNLOCK
+	MUTEX UNLOCK
+	*/
 	return;
 }
 
@@ -45,7 +55,12 @@ void insertOrder(bookOrder *incoming) {	//Should only be run by the producer thr
 bookOrder* getOrder(char* category) {	//Should only be run by consumer thread. Need to apply mutex for threads where necessary.
 	bookOrder *ret = NULL;
 	ENTRY temp, *res;
-	//mutex lock here, i suppose
+	/*
+		MUTEX LOCK 
+		MUTEX LOCK
+		MUTEX LOCK
+		MUTEX LOCK
+	 */
 	temp->key = category;
 	res = hsearch(temp,FIND);
 	if(res == NULL) {
@@ -58,14 +73,31 @@ bookOrder* getOrder(char* category) {	//Should only be run by consumer thread. N
 		do {
 			ret = Q->first;
 			if(ret == NULL) //Queue is empty. Have consumer thread sleep for a bit here while the processor thread populates queue.
-				//mutex unlock here i suppose
-				//thread sleep here, i suppose.
-				//mutex lock here i suppose.
+				/*
+				MUTEX UNLOCK
+				MUTEX UNLOCK
+				MUTEX UNLOCK
+				MUTEX UNLOCK
+				*/
+				
+				//THREAD SLEEP FOR 1~2 SECONDS
+				
+				/*
+				MUTEX LOCK 
+				MUTEX LOCK
+				MUTEX LOCK
+				MUTEX LOCK
+				*/
 		} whie(ret == NULL);
 		Q->first = Q->first->next;
 		ret->next = NULL;
 	}
-	//mutex unlock here i suppose
+	/*
+	MUTEX UNLOCK
+	MUTEX UNLOCK
+	MUTEX UNLOCK
+	MUTEX UNLOCK
+	*/
 	return ret;
 }
 
