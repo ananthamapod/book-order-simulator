@@ -3,6 +3,10 @@
 #include <ctype.h>
 #include <string.h>
 
+
+/*------------------- TOKENIZER FOR FILES ------------------------------------*/
+
+
 //MAKTOKSIZE defined so that there is a fixed maximum size for the string buffer
 #define MAXTOKSIZE 1000
 
@@ -41,7 +45,7 @@ char *TKGetNextToken(TokenizerT *tk) {
 	char currChar = fgetc(tk->file);
 	int pos = 0;
 	while(currChar != EOF && pos < MAXTOKSIZE) {
-		currChar = tolower(currChar);
+		currChar = toupper(currChar);
 		if(currChar != '|' && currChar != '\n') {
 			buffer[pos] = currChar;
 			pos++;
@@ -55,6 +59,7 @@ char *TKGetNextToken(TokenizerT *tk) {
 	/*if pos is 0 at this point, it means that EOF has been reached without populating any further tokens,
 	*so returns NULL*/
 	if(pos == 0) {
+		free(buffer);
 		return NULL;
 	}
 	//adding the null termination
@@ -71,20 +76,21 @@ Frees allocated memory for TokenizerT object
 void TKDestroy(TokenizerT *tk) {
 	free(tk);
 }
-/*int main(int argc, char** argv) {
-	if(argc != 3) {
-		printf("Not enough arguments.\n");
-		return -1;
+
+/*---------------------------------------------------------------------*/
+
+/*----------- UTILITY FOR FINDING NUMBER OF LINES IN A FILE -----------*/
+
+int numLines(FILE *file) {
+	int count = 0;
+	char buffer[1024];
+	int curr = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	while(fgets (buffer, 1024, file) != NULL) {
+		count++;
 	}
-	FILE *to_file = fopen(argv[1], "w+");
-	FILE *from_file = fopen(argv[2], "r");
-	TokenizerT *tk = TKCreate(from_file);
-	char *token = TKGetNextToken(tk);
-	while(token != NULL) {
-		fwrite(token,sizeof(char),strlen(token),to_file);
-		fwrite("\n",sizeof(char),1,to_file);
-		token = TKGetNextToken(tk);
-	}
-	
-	return 0;
-}*/
+	fseek(file, curr, SEEK_SET);
+	return count;
+}
+
+/*---------------------------------------------------------------------*/

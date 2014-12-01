@@ -1,68 +1,76 @@
 /*defines*/
-
+#include <stdio.h>
+#include <stdlib.h>
 /*includes*/
 
 /*structs*/
-typedef struct ENTRY_T {
+typedef struct Entry_T {
 	int key;
 	void *data;
-} ENTRY;
+} Entry;
 
 typedef struct hash {
 	int size;
-	ENTRY *customerList;
-	void (*) () destroy;
+	Entry *customerList;
+	void (*destroy)();
 } Hash;
 
 /*enums*/
-typedef enum ACTION_T {FIND,ENTER} ACTION;
+typedef enum Action_T {SEARCH,ADD} Action;
 /*globals*/
+Hash *custDB;
 
 /*main code*/
 
-/*Function that initializes hash table and entries, also takes in function responsible for freeing data*/
-Hash *HCreate (int size, void (*)() destroy) {
-	Hash *newHash = (Hash *) malloc(sizeof(Hash));
-	newHash->size = size;
-	newHash->customerList = (ENTRY *) malloc(size * sizeof(ENTRY));
-	newHash->destroy = destroy;
-	ENTRY *customers = newHash->customerList;
+/*Function that initializes hash table and entries, also takes in function responsible for freeing data
+ *
+*/
+Hash *HCreate (int size, void (*destroy) ()) {
+	custDB = (Hash *) malloc(sizeof(Hash));
+	custDB->size = size;
+	custDB->customerList = (Entry *) malloc(size * sizeof(Entry));
+	custDB->destroy = destroy;
+	Entry *customers = custDB->customerList;
 	int i;
 	for(i = 0; i < size; i++) {
-		customers[i] = NULL;
+		customers[i].key = i+1;
+		customers[i].data = NULL;
 	}
-	return newHash;
+	return custDB;
 }
 
 /*Function that finds entry in hash table corresponding to entry's key
-If action is ENTER, adds entry to hash table
-If action is FIND, returns entry in hash table corresponding to entry's key*/
-ENTRY *HSearch (Hash *hash, ENTRY *entry, ACTION action) {
-	if(hash == NULL || entry == NULL) {
+* If action is ENTER, adds entry to hash table
+* If action is FIND, returns entry in hash table corresponding to entry's key
+*/
+Entry *HSearch (Entry entry, Action action) {
+	if(custDB == NULL) {
 		return NULL;
 	}
-	if((entry->key < hash->size) && (entry->key >= 0)) {
-		if(action == ENTER) {
-			hash->customerList[entry->key]->data = entry->data;
+	if((entry.key <= custDB->size) && (entry.key > 0)) {
+		if(action == ADD) {
+			custDB->customerList[entry.key-1].data = entry.data;
 		}
-		return hash->customerList[key];
+		return &(custDB->customerList[entry.key-1]);
 	}
 
 	return NULL;
 }
 
-/*Function that frees all memory allocated by hash table, entries, and entry data*/
-void HDestroy(Hash *hash) {
-	if(hash == NULL) {
+/*Function that frees all memory allocated by hash table, entries, and entry data
+ *
+*/
+void HDestroy() {
+	if(custDB == NULL) {
 		return;
 	}
 
 	int i;
-	ENTRY *customers = hash->customerList;
-	void (*)() destroy = hash->destroy;
-	for(i = 0; i < size; i++) {
-		destroy(customers[i]->data);
+	Entry *customers = custDB->customerList;
+	void (*destroy)() = custDB->destroy;
+	for(i = 0; i < custDB->size; i++) {
+		destroy(customers[i].data);
 	}
 	free(customers);
-	free(hash);
+	free(custDB);
 }

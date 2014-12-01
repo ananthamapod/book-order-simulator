@@ -5,8 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tknz3r.h"
-#include "queue.h"
+#include <pthread.h>
 
 /*structs*/
 typedef struct BookOrder_T {
@@ -14,6 +13,7 @@ typedef struct BookOrder_T {
 	float price;
 	int custID;
 	char* category;
+	struct BookOrder_T * next;
 } bookOrder;
 
 typedef struct OrderResult_T{
@@ -27,13 +27,28 @@ typedef struct cust_T {
 	char* name;
 	int ID;
 	float credit;
-	string address;
-	string state;
-	string zip;
-	//struct cust_T* next;
+	char* address;
+	char* state;
+	char* zip;
 	OrderResult *success;
 	OrderResult *failure;
-} customer;
+	pthread_mutex_t mutex;
+} Customer;
+
+typedef struct carrier_t{
+	char* first;
+	char* second;
+} carrier;
 
 /*globals*/
-Hash *custDB;	//Need to create.
+
+/*functions*/
+void *initOrderStructure(void *); 
+
+void *parseOrders(void *filename);
+
+void killOrder(char* categoryTable[], int num);
+
+void makeQueueTable(FILE* CatFile,char** categories);
+
+void exitPrint(char* msg); 

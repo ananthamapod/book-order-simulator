@@ -19,3 +19,5 @@ Returns: char pointer pointing to token
 char *TKGetNextToken(TokenizerT *tk);
 
 void TKDestroy(TokenizerT *tk);
+
+int numLines(FILE *file);
